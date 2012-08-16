@@ -241,3 +241,13 @@ COMPRESS_JS_FILTERS = [
     'compressor.filters.template.TemplateFilter',
 ]
 ########## END COMPRESSION CONFIGURATION
+
+########## DJANGO MESSAGING CONFIGURATION
+from django.contrib.messages import constants as message_constants
+
+MESSAGE_TAGS = {message_constants.DEBUG: 'alert alert-info',
+                message_constants.INFO: 'alert alert-info',
+                message_constants.SUCCESS: 'alert alert-success',
+                message_constants.WARNING: 'alert alert-block',
+                message_constants.ERROR: 'alert alert-error', }
+########## END DJANGO MESSAGING CONFIGURATION

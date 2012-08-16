@@ -2,6 +2,8 @@
 
 
 from os import environ
+from string import ascii_letters
+from random import choice
 
 from memcacheify import memcacheify
 from postgresify import postgresify
@@ -129,3 +131,12 @@ COMPRESS_JS_FILTERS += [
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = environ.get('SECRET_KEY', SECRET_KEY)
 ########## END SECRET CONFIGURATION
+
+
+########## COOKIE CONFIGURATION
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_NAME = ''.join(choice(ascii_letters) for i in range(10))
+########## COOKIE CONFIGURATION
+
