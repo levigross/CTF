@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>How To</th>
+	    <th>Type</th>
+	    <th>Points</th>
+            <th>Hint! (Don't Cheat)!!</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cha in challanges %}
+            <tr>
+                <td>{{ cha.title }}</td>
+                <td>{{ cha.guide }}</td>
+		<td>{{ cha.get_challenge_type_display }}</td>
+		<td>{{ cha.points }}</td>
+                <td>{{ cha.hint }}</td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
