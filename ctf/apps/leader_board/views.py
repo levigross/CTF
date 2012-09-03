@@ -23,14 +23,15 @@ class Home(TemplateView):
         request.session.delete_test_cookie()
 
         handle_form = HandleSubmissionForm(self.request.POST)
-        if handle_form.is_valid() and handle_form.save(commit=False):
-            handle_form.save()
-            handle_name = handle_form.cleaned_data.get('handle_name')
-            messages.add_message(self.request, messages.INFO, u"Welcome to HackNight! {0}".format(handle_name))
-            self.request.session['user_handle'] = handle_name
-            return redirect('leader_board')
-        else:
+        if not handle_form.is_valid() and not handle_form.save(commit=False):
             return self.get(request, form=handle_form)
+
+        handle_form.save()
+        handle_name = handle_form.cleaned_data.get('handle_name')
+        messages.add_message(self.request, messages.INFO, u"Welcome to HackNight! {0}".format(handle_name))
+        self.request.session['user_handle'] = handle_name
+        return redirect('leader_board')
+
 
 
     def get_context_data(self, **kwargs):
@@ -54,28 +55,29 @@ class Flag(TemplateView):
 
     def post(self, request):
         flag_form = FlagSubmitForm(self.request.POST)
-        if flag_form.is_valid():
-            user_handle = get_object_or_404(UserHandle, handle_name=self.request.session.get("user_handle"))
-            completed = Challenge.objects.get(id=flag_form.cleaned_data.get('success_flag'))
-            com = CompletedChallanges.objects.get_or_create(user_handle=user_handle)[0]
-
-            if completed in com.challange.all():
-                messages.add_message(self.request, messages.INFO,
-                    "You cannot complete a challenge twice!".format(completed))
-                return self.get(self.request)
-
-            com.challange.add(completed)
-            com.save()
-            user_handle.score += completed.points
-            user_handle.save()
-
-            messages.add_message(self.request, messages.INFO,
-                u"Congratulations on completing challenge {0}!".format(completed))
-            self.request.session.cycle_key()
-            self.request.session['user_handle'] = user_handle.handle_name
-            return redirect('leader_board')
-        else:
+        if not flag_form.is_valid():
             return self.get(request, form=flag_form)
+
+        user_handle = get_object_or_404(UserHandle, handle_name=self.request.session.get("user_handle"))
+        completed = Challenge.objects.get(id=flag_form.cleaned_data.get('success_flag'))
+        com = CompletedChallanges.objects.get_or_create(user_handle=user_handle)[0]
+
+        if completed in com.challange.all():
+            messages.add_message(self.request, messages.INFO,
+                "You cannot complete a challenge twice!".format(completed))
+            return self.get(self.request)
+
+        com.challange.add(completed)
+        com.save()
+        user_handle.score += completed.points
+        user_handle.save()
+
+        messages.add_message(self.request, messages.INFO,
+            u"Congratulations on completing challenge {0}!".format(completed))
+        self.request.session.cycle_key()
+        self.request.session['user_handle'] = user_handle.handle_name # In some cases you lose session data
+        return redirect('leader_board')
+
 
     def get(self, request, *args, **kwargs):
         if 'user_handle' not in self.request.session:
